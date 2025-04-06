@@ -5,17 +5,16 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::domain::commands::ChatCommand;
-use crate::services::ChatRoomView;
 use crate::ChatRoomFramework;
 
 pub struct WebApi {
-    framework: ChatRoomFramework,
+    framework: Arc<ChatRoomFramework>,
     view_repository: Arc<crate::services::ChatRoomViewRepository>,
 }
 
 impl WebApi {
     pub fn new(
-        framework: ChatRoomFramework,
+        framework: Arc<ChatRoomFramework>,
         view_repository: Arc<crate::services::ChatRoomViewRepository>,
     ) -> Self {
         Self {
@@ -29,19 +28,20 @@ impl WebApi {
         let view_repository = self.view_repository.clone();
 
         HttpServer::new(move || {
-            App::new()
-                .app_data(web::Data::new(framework.clone()))
-                .app_data(web::Data::new(view_repository.clone()))
-                .service(
-                    web::scope("/api")
-                        .route("/rooms", web::get().to(get_rooms))
-                        .route("/rooms", web::post().to(create_room))
-                        .route("/rooms/{room_id}", web::get().to(get_room))
-                        .route("/rooms/{room_id}/join", web::post().to(join_room))
-                        .route("/rooms/{room_id}/leave", web::post().to(leave_room))
-                        .route("/rooms/{room_id}/messages", web::post().to(send_message))
-                )
+            let app = App::new();
+            let app = app.app_data(web::Data::new(framework.clone()));
+            let app = app.app_data(web::Data::new(view_repository.clone()));
+            app.service(
+                web::scope("/api")
+                    .route("/rooms", web::get().to(get_rooms))
+                    .route("/rooms", web::post().to(create_room))
+                    .route("/rooms/{room_id}", web::get().to(get_room))
+                    .route("/rooms/{room_id}/join", web::post().to(join_room))
+                    .route("/rooms/{room_id}/leave", web::post().to(leave_room))
+                    .route("/rooms/{room_id}/messages", web::post().to(send_message))
+            )
         })
+        .workers(2)
         .bind((host, port))?
         .run()
         .await
@@ -92,7 +92,7 @@ async fn get_room(
 
 async fn create_room(
     req: web::Json<CreateRoomRequest>,
-    framework: web::Data<ChatRoomFramework>,
+    framework: web::Data<Arc<ChatRoomFramework>>,
 ) -> impl Responder {
     let room_id = Uuid::new_v4();
     
@@ -111,7 +111,7 @@ async fn create_room(
 async fn join_room(
     room_id: web::Path<Uuid>,
     req: web::Json<JoinRoomRequest>,
-    framework: web::Data<ChatRoomFramework>,
+    framework: web::Data<Arc<ChatRoomFramework>>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     
@@ -129,7 +129,7 @@ async fn join_room(
 async fn leave_room(
     room_id: web::Path<Uuid>,
     req: web::Json<LeaveRoomRequest>,
-    framework: web::Data<ChatRoomFramework>,
+    framework: web::Data<Arc<ChatRoomFramework>>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     
@@ -146,7 +146,7 @@ async fn leave_room(
 async fn send_message(
     room_id: web::Path<Uuid>,
     req: web::Json<SendMessageRequest>,
-    framework: web::Data<ChatRoomFramework>,
+    framework: web::Data<Arc<ChatRoomFramework>>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     let message_id = Uuid::new_v4();

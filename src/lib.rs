@@ -19,7 +19,8 @@ pub fn create_chat_framework() -> (ChatRoomFramework, Arc<ChatRoomViewRepository
     let services = ChatServices;
     let view_repository = Arc::new(ChatRoomViewRepository::new());
     
-    let queries: Vec<Box<dyn Query<ChatRoom>>> = vec![Box::new(view_repository.clone())];
+    let query_repo = ChatRoomViewRepository::new();
+    let queries: Vec<Box<dyn Query<ChatRoom>>> = vec![Box::new(query_repo)];
     let framework = CqrsFramework::new(event_store, queries, services);
     
     (framework, view_repository)
