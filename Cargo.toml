@@ -1,11 +1,30 @@
 [package]
-name = "mybank"
+name = "chat-app"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+# CQRS and Event Sourcing
 cqrs-es = "0.4.2"
 async-trait = "0.1.52"
 serde = { version = "1.0", features = ["derive"]}
 tokio = { version = "1", features = ["full"] }
+
+# TUI
+cursive = "0.21.1"
+
+# Web API
+actix-web = "4.10.2"
+actix-rt = "2.9.0"
+
+# Actor System (Akka-inspired)
+xactor = "0.7.10"
+
+# Utilities
+uuid = { version = "1.7.0", features = ["v4", "serde"] }
+chrono = { version = "0.4.35", features = ["serde"] }
+log = "0.4.21"
+env_logger = "0.11.2"
+thiserror = "1.0.57"
+anyhow = "1.0.79"
 
