@@ -1,5 +1,26 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all)]
 
-mod domain;
-mod services;
+pub mod domain;
+pub mod services;
+pub mod tui;
+pub mod web;
+
+use cqrs_es::{CqrsFramework, Query};
+use std::sync::Arc;
+
+use domain::aggregate::ChatRoom;
+use services::{ChatRoomViewRepository, ChatServices, PostgresEventStore};
+
+pub type ChatRoomFramework = CqrsFramework<ChatRoom, PostgresEventStore, ChatServices>;
+
+pub fn create_chat_framework() -> (ChatRoomFramework, Arc<ChatRoomViewRepository>) {
+    let event_store = PostgresEventStore::new();
+    let services = ChatServices;
+    let view_repository = Arc::new(ChatRoomViewRepository::new());
+    
+    let queries: Vec<Arc<dyn Query<ChatRoom>>> = vec![view_repository.clone()];
+    let framework = CqrsFramework::new(event_store, services, queries);
+    
+    (framework, view_repository)
+}
