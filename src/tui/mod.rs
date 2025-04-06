@@ -15,7 +15,7 @@ use crate::services::ChatRoomView;
 use crate::ChatRoomFramework;
 
 pub struct TuiApp {
-    framework: Arc<ChatRoomFramework>,
+    framework: ChatRoomFramework,
     view_repository: Arc<crate::services::ChatRoomViewRepository>,
     runtime: Runtime,
     current_room: Option<Uuid>,
@@ -34,7 +34,7 @@ impl TuiApp {
             .expect("Failed to create Tokio runtime");
 
         Self {
-            framework: Arc::new(framework),
+            framework,
             view_repository,
             runtime,
             current_room: None,

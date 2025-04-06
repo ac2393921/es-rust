@@ -12,15 +12,15 @@ use std::sync::Arc;
 use domain::aggregate::ChatRoom;
 use services::{ChatRoomViewRepository, ChatServices, PostgresEventStore};
 
-pub type ChatRoomFramework = CqrsFramework<ChatRoom, PostgresEventStore, ChatServices>;
+pub type ChatRoomFramework = CqrsFramework<ChatRoom, PostgresEventStore>;
 
 pub fn create_chat_framework() -> (ChatRoomFramework, Arc<ChatRoomViewRepository>) {
     let event_store = PostgresEventStore::new();
     let services = ChatServices;
     let view_repository = Arc::new(ChatRoomViewRepository::new());
     
-    let queries: Vec<Arc<dyn Query<ChatRoom>>> = vec![view_repository.clone()];
-    let framework = CqrsFramework::new(event_store, services, queries);
+    let queries: Vec<Box<dyn Query<ChatRoom>>> = vec![Box::new(view_repository.clone())];
+    let framework = CqrsFramework::new(event_store, queries, services);
     
     (framework, view_repository)
 }

@@ -1,7 +1,8 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use cqrs_es::{EventEnvelope, EventStore, Query};
+use cqrs_es::{AggregateContext, AggregateError, EventEnvelope, EventStore, Query};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use uuid::Uuid;
@@ -76,7 +77,16 @@ impl ChatRoomViewRepository {
 
 #[async_trait]
 impl Query<ChatRoom> for ChatRoomViewRepository {
-    async fn dispatch(&self, aggregate_id: &str, events: &[EventEnvelope<ChatRoom>]) -> Result<(), anyhow::Error> {
+    async fn dispatch(&self, aggregate_id: &str, events: &[EventEnvelope<ChatRoom>]) {
+        let result = self.update_view(aggregate_id, events).await;
+        if let Err(e) = result {
+            log::error!("Error updating view: {}", e);
+        }
+    }
+}
+
+impl ChatRoomViewRepository {
+    async fn update_view(&self, aggregate_id: &str, events: &[EventEnvelope<ChatRoom>]) -> Result<(), anyhow::Error> {
         let mut views = self.views.write().await;
         
         for event_envelope in events {
@@ -145,16 +155,46 @@ impl PostgresEventStore {
     }
 }
 
+use cqrs_es::{AggregateContext, AggregateError};
+use std::collections::HashMap;
+
 #[async_trait]
 impl EventStore<ChatRoom> for PostgresEventStore {
-    async fn load_events(&self, aggregate_id: &str) -> Result<Vec<EventEnvelope<ChatRoom>>, anyhow::Error> {
+    type AC = AggregateContext<ChatRoom>;
+
+    async fn load_events(&self, aggregate_id: &str) -> Result<Vec<EventEnvelope<ChatRoom>>, AggregateError<crate::domain::events::ChatError>> {
         Ok(Vec::new())
     }
 
-    async fn append_events(&self, aggregate_id: &str, events: &[EventEnvelope<ChatRoom>]) -> Result<(), anyhow::Error> {
+    async fn load_aggregate(&self, aggregate_id: &str) -> Result<Self::AC, AggregateError<crate::domain::events::ChatError>> {
+        let events = self.load_events(aggregate_id).await?;
+        let aggregate_context = AggregateContext::new(aggregate_id, events);
+        Ok(aggregate_context)
+    }
+
+    async fn append_events(&self, aggregate_id: &str, events: &[EventEnvelope<ChatRoom>]) -> Result<(), AggregateError<crate::domain::events::ChatError>> {
         for event in events {
             log::info!("Appending event: {:?} for aggregate: {}", event.payload, aggregate_id);
         }
         Ok(())
+    }
+
+    async fn commit(
+        &self,
+        events: Vec<crate::domain::events::ChatEvent>,
+        aggregate_context: Self::AC,
+        metadata: HashMap<String, String>,
+    ) -> Result<Vec<EventEnvelope<ChatRoom>>, AggregateError<crate::domain::events::ChatError>> {
+        let aggregate_id = aggregate_context.aggregate_id().to_string();
+        let committed_events = EventEnvelope::from_events(
+            &aggregate_id,
+            aggregate_context.current_sequence() + 1,
+            events,
+            metadata,
+        );
+        
+        self.append_events(&aggregate_id, &committed_events).await?;
+        
+        Ok(committed_events)
     }
 }

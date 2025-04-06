@@ -9,7 +9,7 @@ use crate::services::ChatRoomView;
 use crate::ChatRoomFramework;
 
 pub struct WebApi {
-    framework: Arc<ChatRoomFramework>,
+    framework: ChatRoomFramework,
     view_repository: Arc<crate::services::ChatRoomViewRepository>,
 }
 
@@ -19,13 +19,13 @@ impl WebApi {
         view_repository: Arc<crate::services::ChatRoomViewRepository>,
     ) -> Self {
         Self {
-            framework: Arc::new(framework),
+            framework,
             view_repository,
         }
     }
 
     pub async fn run(self, host: &str, port: u16) -> std::io::Result<()> {
-        let framework = self.framework.clone();
+        let framework = self.framework;
         let view_repository = self.view_repository.clone();
 
         HttpServer::new(move || {
@@ -92,7 +92,7 @@ async fn get_room(
 
 async fn create_room(
     req: web::Json<CreateRoomRequest>,
-    framework: web::Data<Arc<ChatRoomFramework>>,
+    framework: web::Data<ChatRoomFramework>,
 ) -> impl Responder {
     let room_id = Uuid::new_v4();
     
@@ -111,7 +111,7 @@ async fn create_room(
 async fn join_room(
     room_id: web::Path<Uuid>,
     req: web::Json<JoinRoomRequest>,
-    framework: web::Data<Arc<ChatRoomFramework>>,
+    framework: web::Data<ChatRoomFramework>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     
@@ -129,7 +129,7 @@ async fn join_room(
 async fn leave_room(
     room_id: web::Path<Uuid>,
     req: web::Json<LeaveRoomRequest>,
-    framework: web::Data<Arc<ChatRoomFramework>>,
+    framework: web::Data<ChatRoomFramework>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     
@@ -146,7 +146,7 @@ async fn leave_room(
 async fn send_message(
     room_id: web::Path<Uuid>,
     req: web::Json<SendMessageRequest>,
-    framework: web::Data<Arc<ChatRoomFramework>>,
+    framework: web::Data<ChatRoomFramework>,
 ) -> impl Responder {
     let room_id = room_id.into_inner();
     let message_id = Uuid::new_v4();
