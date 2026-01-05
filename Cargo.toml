@@ -1,0 +1,30 @@
+[package]
+name = "inventory-system"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# CQRS and Event Sourcing
+cqrs-es = "0.4.2"
+async-trait = "0.1.52"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+
+# Web API
+actix-web = "4.10.2"
+actix-rt = "2.9.0"
+
+# Database
+sqlx = { version = "0.8", features = ["postgres", "runtime-tokio-native-tls", "uuid", "chrono"] }
+
+# Utilities
+uuid = { version = "1.7.0", features = ["v4", "serde"] }
+chrono = { version = "0.4.35", features = ["serde"] }
+log = "0.4.21"
+env_logger = "0.11.2"
+thiserror = "1.0.57"
+anyhow = "1.0.79"
+dotenv = "0.15.0"
+
+[dev-dependencies]
+tokio-test = "0.4"
