@@ -11,7 +11,18 @@
       "mcp__voicevox__speak",
       "Bash(docker-compose up:*)",
       "Bash(docker-compose ps:*)",
-      "Bash(docker-compose logs:*)"
+      "Bash(docker-compose logs:*)",
+      "Bash(claude plugin install:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(opencode --version:*)",
+      "Bash(npx oh-my-opencode:*)",
+      "Bash(brew install:*)",
+      "Bash(brew tap:*)",
+      "Bash(bunx oh-my-opencode:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo clippy:*)",
+      "Bash(cargo fmt:*)",
+      "Bash(tree:*)"
     ]
   }
 }
