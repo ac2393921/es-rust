@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(analyzing-requirements)",
+      "Skill(planning-tasks)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(cargo test:*)"
+    ]
+  }
+}
