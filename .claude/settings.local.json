@@ -13,6 +13,8 @@
       "Bash(docker-compose ps:*)",
       "Bash(docker-compose logs:*)",
       "Bash(claude plugin install:*)",
+      "Bash(claude plugin uninstall:*)",
+      "Bash(claude plugin remove:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(opencode --version:*)",
       "Bash(npx oh-my-opencode:*)",
@@ -22,7 +24,14 @@
       "Bash(cargo build:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(claude plugin list:*)",
+      "Bash(claude plugin --help:*)",
+      "Bash(done)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(ccusage)",
+      "Bash(wc:*)"
     ]
   }
 }

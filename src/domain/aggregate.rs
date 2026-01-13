@@ -9,8 +9,7 @@ use super::events::{ProductError, ProductEvent};
 
 // ===== Domain: Product Aggregate =====
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Product {
     pub product_id: Option<Uuid>,
     pub product_code: String,
@@ -19,7 +18,6 @@ pub struct Product {
     pub current_stock: i32,
     pub created_at: Option<DateTime<Utc>>,
 }
-
 
 // ===== Services (空の構造体でOK) =====
 

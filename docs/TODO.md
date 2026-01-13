@@ -20,12 +20,12 @@ Event Sourcing/CQRSアーキテクチャで実装する在庫管理システム�
 ### フェーズ0: プロジェクト基盤構築
 
 - [x] Cargo.tomlの作成（依存関係定義）
-- [ ] [STRUCTURAL] docker-compose.ymlの作成
-- [ ] [STRUCTURAL] PostgreSQLスキーマ（migrations/001_init.sql）の作成
-- [ ] [STRUCTURAL] .env.exampleの作成
-- [ ] [STRUCTURAL] Dockerfileの作成
-- [ ] [STRUCTURAL] 基本ディレクトリ構造の作成（src/domain/, src/web/, tests/）
-- [ ] [CHECK] プロジェクト構成の確認（cargo build が通ること）
+- [x] [STRUCTURAL] docker-compose.ymlの作成
+- [x] [STRUCTURAL] PostgreSQLスキーマ（migrations/001_init.sql）の作成
+- [x] [STRUCTURAL] .env.exampleの作成
+- [x] [STRUCTURAL] Dockerfileの作成
+- [x] [STRUCTURAL] 基本ディレクトリ構造の作成（src/domain/, src/web/, tests/）
+- [x] [CHECK] プロジェクト構成の確認（cargo build が通ること）
 
 ### フェーズ1: 商品登録機能の実装
 
@@ -39,20 +39,20 @@ Event Sourcing/CQRSアーキテクチャで実装する在庫管理システム�
 
 #### 1.2 ドメイン層の実装（GREEN）
 
-- [ ] [GREEN] src/domain/events.rs の作成
+- [x] [GREEN] src/domain/events.rs の作成
   - ProductEvent::ProductRegistered の定義
   - ProductError enum の定義（ProductAlreadyExists等）
   - serde traits の実装
-- [ ] [GREEN] src/domain/commands.rs の作成
+- [x] [GREEN] src/domain/commands.rs の作成
   - ProductCommand::RegisterProduct の定義
-- [ ] [GREEN] src/domain/aggregate.rs の作成
+- [x] [GREEN] src/domain/aggregate.rs の作成
   - Product struct の定義
   - Aggregate trait の実装
   - handle() メソッド（RegisterProduct処理）
   - apply() メソッド（ProductRegistered適用）
-- [ ] [GREEN] src/domain/mod.rs の作成（モジュール公開）
-- [ ] [GREEN] src/lib.rs の作成（ライブラリエクスポート）
-- [ ] [CHECK] テスト実行で成功を確認（cargo test）
+- [x] [GREEN] src/domain/mod.rs の作成（モジュール公開）
+- [x] [GREEN] src/lib.rs の作成（ライブラリエクスポート）
+- [x] [CHECK] テスト実行で成功を確認（cargo test）
 - [ ] [BEHAVIORAL] コミット: "feat: implement product registration"
 
 #### 1.3 リファクタリング（REFACTOR）
@@ -78,13 +78,13 @@ Event Sourcing/CQRSアーキテクチャで実装する在庫管理システム�
 
 #### 2.2 ドメイン層の実装（GREEN）
 
-- [ ] [GREEN] src/domain/events.rs に InboundRecorded イベントを追加
-- [ ] [GREEN] src/domain/commands.rs に RecordInbound コマンドを追加
-- [ ] [GREEN] src/domain/aggregate.rs に入庫処理を追加
+- [x] [GREEN] src/domain/events.rs に InboundRecorded イベントを追加
+- [x] [GREEN] src/domain/commands.rs に RecordInbound コマンドを追加
+- [x] [GREEN] src/domain/aggregate.rs に入庫処理を追加
   - handle() に RecordInbound 処理を追加
   - apply() に InboundRecorded 処理を追加（在庫数増加）
   - バリデーションロジック（商品存在チェック、数量チェック）
-- [ ] [CHECK] テスト実行で成功を確認（cargo test）
+- [x] [CHECK] テスト実行で成功を確認（cargo test）
 - [ ] [BEHAVIORAL] コミット: "feat: implement inbound recording"
 
 #### 2.3 リファクタリング（REFACTOR）
@@ -111,13 +111,13 @@ Event Sourcing/CQRSアーキテクチャで実装する在庫管理システム�
 
 #### 3.2 ドメイン層の実装（GREEN）
 
-- [ ] [GREEN] src/domain/events.rs に OutboundRecorded イベントを追加
-- [ ] [GREEN] src/domain/commands.rs に RecordOutbound コマンドを追加
-- [ ] [GREEN] src/domain/aggregate.rs に出庫処理を追加
+- [x] [GREEN] src/domain/events.rs に OutboundRecorded イベントを追加
+- [x] [GREEN] src/domain/commands.rs に RecordOutbound コマンドを追加
+- [x] [GREEN] src/domain/aggregate.rs に出庫処理を追加
   - handle() に RecordOutbound 処理を追加（在庫チェック含む）
   - apply() に OutboundRecorded 処理を追加（在庫数減少）
   - InsufficientStock エラーの実装
-- [ ] [CHECK] テスト実行で成功を確認（cargo test）
+- [x] [CHECK] テスト実行で成功を確認（cargo test）
 - [ ] [BEHAVIORAL] コミット: "feat: implement outbound recording with stock validation"
 
 #### 3.3 リファクタリング（REFACTOR）
@@ -339,13 +339,13 @@ docker-compose up -d
 
 ## 進捗トラッキング
 
-- **フェーズ0**: [ ] 完了（0/7タスク）
-- **フェーズ1**: [ ] 完了（0/9タスク）
-- **フェーズ2**: [ ] 完了（0/9タスク）
-- **フェーズ3**: [ ] 完了（0/10タスク）
+- **フェーズ0**: [x] 完了（7/7タスク）
+- **フェーズ1**: [ ] 完了（6/9タスク） - ドメイン層実装完了、リファクタリング未実施
+- **フェーズ2**: [ ] 完了（4/9タスク） - ドメイン層実装完了、リファクタリング未実施
+- **フェーズ3**: [ ] 完了（4/10タスク） - ドメイン層実装完了、リファクタリング未実施
 - **フェーズ4**: [ ] 完了（0/7タスク）
 - **フェーズ5**: [ ] 完了（0/13タスク）
 - **フェーズ6**: [ ] 完了（0/5タスク）
 - **フェーズ7**: [ ] 完了（0/7タスク）
 
-**全体進捗**: 1/67タスク完了（1.5%）
+**全体進捗**: 21/67タスク完了（31.3%）
