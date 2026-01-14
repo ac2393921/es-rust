@@ -7,8 +7,6 @@ use uuid::Uuid;
 use super::commands::ProductCommand;
 use super::events::{ProductError, ProductEvent};
 
-// ===== Domain: Product Aggregate =====
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Product {
     pub product_id: Option<Uuid>,
@@ -19,8 +17,6 @@ pub struct Product {
     pub created_at: Option<DateTime<Utc>>,
 }
 
-// ===== Services (空の構造体でOK) =====
-
 #[derive(Debug, Clone)]
 pub struct ProductServices;
 
@@ -29,8 +25,6 @@ impl Default for ProductServices {
         Self
     }
 }
-
-// ===== Aggregate Implementation =====
 
 #[async_trait]
 impl Aggregate for Product {
