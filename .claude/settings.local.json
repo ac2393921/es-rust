@@ -32,7 +32,12 @@
       "Bash(find:*)",
       "Bash(ccusage)",
       "Bash(wc:*)",
-      "Bash(RUST_LOG=info cargo run:*)"
+      "Bash(RUST_LOG=info cargo run:*)",
+      "Bash(cargo doc:*)",
+      "WebFetch(domain:docs.rs)",
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "Skill(commit-and-push)"
     ]
   }
 }
