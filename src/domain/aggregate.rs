@@ -17,12 +17,29 @@ pub struct Product {
     pub created_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone)]
-pub struct ProductServices;
+/// 商品ドメインのサービス（依存性注入用）
+#[derive(Debug, Clone, Default)]
+pub struct ProductServices {
+    /// テスト用の固定時刻（Noneの場合はUtc::now()を使用）
+    fixed_time: Option<DateTime<Utc>>,
+}
 
-impl Default for ProductServices {
-    fn default() -> Self {
-        Self
+impl ProductServices {
+    /// 本番用インスタンスを作成（現在時刻を使用）
+    pub fn new() -> Self {
+        Self { fixed_time: None }
+    }
+
+    /// テスト用インスタンスを作成（固定時刻を使用）
+    pub fn with_fixed_time(time: DateTime<Utc>) -> Self {
+        Self {
+            fixed_time: Some(time),
+        }
+    }
+
+    /// 現在時刻を取得（固定時刻が設定されていればそれを返す）
+    pub fn now(&self) -> DateTime<Utc> {
+        self.fixed_time.unwrap_or_else(Utc::now)
     }
 }
 
@@ -40,7 +57,7 @@ impl Aggregate for Product {
     async fn handle(
         &self,
         command: Self::Command,
-        _services: &Self::Services,
+        services: &Self::Services,
     ) -> Result<Vec<Self::Event>, Self::Error> {
         use ProductCommand::*;
         use ProductEvent::*;
@@ -62,7 +79,7 @@ impl Aggregate for Product {
                     product_code,
                     product_name,
                     unit,
-                    timestamp: Utc::now(),
+                    timestamp: services.now(),
                 }])
             }
 

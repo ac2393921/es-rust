@@ -22,7 +22,7 @@ impl AppState {
         let store = MemStore::<Product>::default();
         let view_repo = ProductViewRepository::new();
         let queries: Vec<Box<dyn cqrs_es::Query<Product>>> = vec![Box::new(view_repo.clone())];
-        let services = ProductServices;
+        let services = ProductServices::new();
 
         let cqrs = Arc::new(CqrsFramework::new(store, queries, services));
 

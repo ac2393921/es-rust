@@ -1,7 +1,7 @@
 // Domain Layer Integration Tests
 // Tests for Product Aggregate business logic
 
-use chrono::Utc;
+use chrono::{TimeZone, Utc};
 use cqrs_es::test::TestFramework;
 use inventory_system::domain::{Product, ProductCommand, ProductEvent, ProductServices};
 use uuid::Uuid;
@@ -10,18 +10,32 @@ type ProductTestFramework = TestFramework<Product>;
 
 #[test]
 fn test_register_product_success() {
-    // Note: timestampは動的に生成されるため、厳密なイベント比較が難しい
-    // 解決策: テスト用に固定のタイムスタンプを使う、またはテストをスキップ
-    // ここではこのテストを簡略化して、エラーが発生しないことだけを確認
+    let product_id = Uuid::new_v4();
+    let fixed_time = Utc.with_ymd_and_hms(2026, 1, 16, 12, 0, 0).unwrap();
+    let services = ProductServices::with_fixed_time(fixed_time);
 
-    // このテストは一旦保留（timestampの問題はPoCの重要な発見）
+    ProductTestFramework::with(services)
+        .given_no_previous_events()
+        .when(ProductCommand::RegisterProduct {
+            product_id,
+            product_code: "P001".to_string(),
+            product_name: "商品A".to_string(),
+            unit: "個".to_string(),
+        })
+        .then_expect_events(vec![ProductEvent::ProductRegistered {
+            product_id,
+            product_code: "P001".to_string(),
+            product_name: "商品A".to_string(),
+            unit: "個".to_string(),
+            timestamp: fixed_time,
+        }]);
 }
 
 #[test]
 fn test_register_product_already_exists() {
     let product_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![ProductEvent::ProductRegistered {
             product_id,
             product_code: "P001".to_string(),
@@ -44,7 +58,7 @@ fn test_record_inbound_success() {
     let inbound_id = Uuid::new_v4();
     let inbound_date = Utc::now();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![ProductEvent::ProductRegistered {
             product_id,
             product_code: "P001".to_string(),
@@ -70,7 +84,7 @@ fn test_record_inbound_success() {
 fn test_record_inbound_product_not_found() {
     let inbound_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given_no_previous_events()
         .when(ProductCommand::RecordInbound {
             inbound_id,
@@ -86,7 +100,7 @@ fn test_record_inbound_invalid_quantity() {
     let product_id = Uuid::new_v4();
     let inbound_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![ProductEvent::ProductRegistered {
             product_id,
             product_code: "P001".to_string(),
@@ -110,7 +124,7 @@ fn test_record_outbound_success() {
     let outbound_id = Uuid::new_v4();
     let outbound_date = Utc::now();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![
             ProductEvent::ProductRegistered {
                 product_id,
@@ -146,7 +160,7 @@ fn test_record_outbound_insufficient_stock() {
     let inbound_id = Uuid::new_v4();
     let outbound_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![
             ProductEvent::ProductRegistered {
                 product_id,
@@ -175,7 +189,7 @@ fn test_record_outbound_insufficient_stock() {
 fn test_record_outbound_product_not_found() {
     let outbound_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given_no_previous_events()
         .when(ProductCommand::RecordOutbound {
             outbound_id,
@@ -192,7 +206,7 @@ fn test_record_outbound_invalid_quantity() {
     let inbound_id = Uuid::new_v4();
     let outbound_id = Uuid::new_v4();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![
             ProductEvent::ProductRegistered {
                 product_id,
@@ -224,7 +238,7 @@ fn test_record_outbound_exact_stock() {
     let outbound_id = Uuid::new_v4();
     let outbound_date = Utc::now();
 
-    ProductTestFramework::with(ProductServices)
+    ProductTestFramework::with(ProductServices::new())
         .given(vec![
             ProductEvent::ProductRegistered {
                 product_id,
